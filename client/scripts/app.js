@@ -1,3 +1,5 @@
+// this will make the ajax request through parse.js
+// then pass that data along to the controllers (messages.js, friends.js, etc)
 var App = {
 
   $spinner: $('.spinner img'),
@@ -7,9 +9,13 @@ var App = {
   initialize: function() {
     App.username = window.location.search.substr(10);
 
+    // use Messages.getMessages to get a list of messages
+    var message = Messages.message;
+
     FormView.initialize();
     RoomsView.initialize();
-    MessagesView.initialize();
+    // pass the messages object into the messages view
+    MessagesView.initialize(message);
 
     // Fetch initial batch of messages
     App.startSpinner();

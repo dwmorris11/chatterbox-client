@@ -6,28 +6,62 @@ var App = {
 
   username: 'anonymous',
 
+  roomname: '',
+
+  sanitizeString: function(data) {
+    if (data === undefined) {
+      return;
+    }
+    const lessThan = /</g
+    const greaterThan = />/g
+    let newString = data.replace(lessThan, '&lt');
+    newString = newString.replace(greaterThan, '&gt');
+    return newString;
+  },
+
+  sanitizeMessage: function(message) {
+    message.text = App.sanitizeString(message.text);
+    message.username = App.sanitizeString(message.username);
+    message.roomname = App.sanitizeString(message.roomname);
+    return message;
+  },
+
   initialize: function() {
     App.username = window.location.search.substr(10);
 
     // use Messages.getMessages to get a list of messages
-    var message = Messages.message;
-
     FormView.initialize();
     RoomsView.initialize();
     // pass the messages object into the messages view
-    MessagesView.initialize(message);
+
 
     // Fetch initial batch of messages
     App.startSpinner();
-    App.fetch(App.stopSpinner);
+    App.fetchMessages();
+    setInterval(() => {
+      App.fetchMessages}, 5000);
 
+  },
+
+  fetchMessages: function() {
+      App.fetch(() => {
+        App.stopSpinner();
+        MessagesView.initialize();
+        RoomsView.initialize();
+        $('.friendLink').click((event) => {
+          event.preventDefault();
+          Friends.toggleStatus(event.target.text);
+        });
+    })
   },
 
   fetch: function(callback = ()=>{}) {
     Parse.readAll((data) => {
       // examine the response from the server request:
-      console.log(data);
-
+      // map a function that sanitizes the text field of each message over data
+      const sanitizedData = _.map(data.results, App.sanitizeMessage);
+      $("#chats").empty();
+      Messages.message = sanitizedData;
       callback();
     });
   },

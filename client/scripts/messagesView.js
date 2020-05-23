@@ -3,24 +3,26 @@
   $chats: $('#chats'),
   messageStorage: [],
 
-  initialize: function (messages) {
-    debugger;
-    _.each(messages, (message) => {
-      this.renderMessage(this.render(message));
+  initialize: function () {
+    // add a onclick handler for adding a friend
+
+    const messages = Messages.message;
+    _.each(messages, (newMessage) => {
+      if(newMessage.roomname === Rooms.currentRoom() || App.roomname === '') {
+        this.renderMessage(this.render(newMessage));
+      }
     });
   },
 
-  // this will render all the messages
-  // it will also fetch and store them
   render: _.template(`
   <div class="chat">
-    <div class="username"><%=username%></div>
+    <div class="username <%=username%>">
+      <a class='friendLink <%=username%>' href=#<%=username%>><%=username%></a>
+    </div>
     <div><%=text%></div>
   </div>
 `),
 
-  //this will render an individual message
-  //it shouldn't fetch anything
   renderMessage: function (html) {
     $("#chats").append(html);
   }

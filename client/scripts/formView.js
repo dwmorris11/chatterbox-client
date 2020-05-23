@@ -4,13 +4,19 @@
 
   initialize: function() {
     FormView.$form.on('submit', FormView.handleSubmit);
+    FormView.$form.on('keydown', (function(event) {
+      if (event.which === 13) {
+          FormView.handleSubmit(event);
+       }
+  }));
   },
 
   handleSubmit: function(event) {
-    // Stop the browser from submitting the form
+    //Pull data from form field
+    let text = $('#message').val();
+    let data = App.sanitizeString(text);
+    Parse.create(Messages.makeMessage(data, App.username, App.roomname));
     event.preventDefault();
-
-    console.log('click!');
   },
 
   setStatus: function(active) {
